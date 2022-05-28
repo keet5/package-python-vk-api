@@ -1,5 +1,5 @@
 import math
-from magic import Magic
+import magic
 from requests import request
 from datetime import datetime
 from operator import itemgetter
@@ -61,19 +61,23 @@ class VkApi:
     def get_attachments(self, files: list[schemas.File]):
         images = []
         videos = []
+        documents = []
 
         for file in files:
 
             if file.type == "image":
-                # if extension == "gif":
-                #     documents.append(file)
-                # else:
-                images.append(file.path)
+                extension = magic.from_file(file.path, mime=True).split("/")[1]
+                if extension == "gif":
+                    documents.append(file.path)
+                else:
+                    images.append(file.path)
             elif file.type == "video":
                 videos.append(file.path)
 
         attachments = ",".join(
-            self.photo_attachments(images) + self.video_attachments(videos)
+            self.photo_attachments(images)
+            + self.video_attachments(videos)
+            + self.document_attachments(documents)
         )
         return attachments
 
