@@ -1,7 +1,6 @@
 import math
 import magic
 from requests import request
-from datetime import datetime
 from operator import itemgetter
 from .exceptions import VkRequestError, VkUploadImageError
 from . import schemas
@@ -42,10 +41,7 @@ class VkApi:
     def wall_post(self, post: schemas.Post):
         post.files = post.files[:10]
 
-        try:
-            attachments = self.get_attachments(post.files)
-        except VkUploadImageError:
-            return False
+        attachments = self.get_attachments(post.files)
 
         params = {
             "owner_id": -self.group_id,
@@ -56,7 +52,7 @@ class VkApi:
         }
 
         result = self.method_request("wall.post", params=params)
-        return True
+        return result
 
     def get_attachments(self, files: list[schemas.File]):
         images = []
